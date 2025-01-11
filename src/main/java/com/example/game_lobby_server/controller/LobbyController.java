@@ -57,11 +57,8 @@ public class LobbyController {
         // ルームを作成 & パスワードを取得
         String createdPassword = roomService.createRoom(roomName);
 
-        // レスポンスメッセージを作成（パスワードをユーザーに教える）
-        String message = "ルームが作成されました。パスワード: " + createdPassword;
-
         // ResponseDtoを返却 (statusは適宜変更してください)
-        ResponseDto responseDto = new ResponseDto(message, "success");
+        ResponseDto responseDto = new ResponseDto(createdPassword, "success");
         return ResponseEntity.ok(responseDto);
     }
 
