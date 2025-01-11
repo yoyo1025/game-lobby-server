@@ -2,6 +2,7 @@ package com.example.game_lobby_server.controller;
 
 import com.example.game_lobby_server.dto.ResponseDto;
 import com.example.game_lobby_server.dto.RoomCreateRequestDto;
+import com.example.game_lobby_server.dto.RoomResponseDto;
 import com.example.game_lobby_server.entity.RoomEntity;
 import com.example.game_lobby_server.service.RoomService;
 import com.example.game_lobby_server.service.SignUpService;
@@ -69,9 +70,16 @@ public class LobbyController {
      * GET /rooms
      */
     @GetMapping(value = "/rooms")
-    public ResponseEntity<List<RoomEntity>> getAllRooms() {
+    public ResponseEntity<List<RoomResponseDto>> getAllRooms() {
         List<RoomEntity> rooms = roomService.getAllRooms();
-        return ResponseEntity.ok(rooms);
+        List<RoomResponseDto> responseList = rooms.stream()
+                .map(room -> new RoomResponseDto(
+                        room.getId(),
+                        room.getName(),
+                        room.getCreatedAt()
+                ))
+                .toList();
+        return ResponseEntity.ok(responseList);
     }
 
     /**
@@ -79,8 +87,13 @@ public class LobbyController {
      * GET /rooms/{id}
      */
     @GetMapping("/rooms/{id}")
-    public ResponseEntity<RoomEntity> getRoomById(@PathVariable("id") int id) {
+    public ResponseEntity<RoomResponseDto> getRoomById(@PathVariable int id) {
         RoomEntity room = roomService.getRoomById(id);
-        return ResponseEntity.ok(room);
+        RoomResponseDto responseDto = new RoomResponseDto(
+                room.getId(),
+                room.getName(),
+                room.getCreatedAt()
+        );
+        return ResponseEntity.ok(responseDto);
     }
 }
