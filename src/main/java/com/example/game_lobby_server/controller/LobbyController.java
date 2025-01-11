@@ -2,14 +2,15 @@ package com.example.game_lobby_server.controller;
 
 import com.example.game_lobby_server.dto.ResponseDto;
 import com.example.game_lobby_server.dto.RoomCreateRequestDto;
+import com.example.game_lobby_server.entity.RoomEntity;
 import com.example.game_lobby_server.service.RoomService;
 import com.example.game_lobby_server.service.SignUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class LobbyController {
@@ -63,5 +64,23 @@ public class LobbyController {
         return ResponseEntity.ok(responseDto);
     }
 
+    /**
+     * 全てのルーム情報を取得
+     * GET /rooms
+     */
+    @GetMapping(value = "/rooms")
+    public ResponseEntity<List<RoomEntity>> getAllRooms() {
+        List<RoomEntity> rooms = roomService.getAllRooms();
+        return ResponseEntity.ok(rooms);
+    }
 
+    /**
+     * 特定のルーム情報を取得
+     * GET /rooms/{id}
+     */
+    @GetMapping("/rooms/{id}")
+    public ResponseEntity<RoomEntity> getRoomById(@PathVariable("id") int id) {
+        RoomEntity room = roomService.getRoomById(id);
+        return ResponseEntity.ok(room);
+    }
 }

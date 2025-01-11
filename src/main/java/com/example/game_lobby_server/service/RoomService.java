@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 @Service
@@ -51,5 +53,23 @@ public class RoomService {
         Random rand = new Random();
         int randomNum = rand.nextInt(9000) + 1000; // 1000〜9999
         return String.valueOf(randomNum);
+    }
+
+    /**
+     * 全てのルームを取得
+     */
+    public List<RoomEntity> getAllRooms() {
+        return roomRepository.findAll();
+    }
+
+    /**
+     * 指定IDのルームを取得
+     *
+     * @param roomId ルームID
+     * @return ルームエンティティ
+     */
+    public RoomEntity getRoomById(int roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new NoSuchElementException("指定したルームが見つかりません。ID=" + roomId));
     }
 }
