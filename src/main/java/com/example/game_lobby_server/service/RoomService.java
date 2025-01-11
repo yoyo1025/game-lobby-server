@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -72,4 +73,24 @@ public class RoomService {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new NoSuchElementException("指定したルームが見つかりません。ID=" + roomId));
     }
+
+    /**
+     * パスワードからルームに参加
+     * @param password 4桁のパスワード
+     * @return ルームが見つかればそのエンティティ、なければnull
+     */
+    public RoomEntity joinRoom(String password) {
+        List<RoomEntity> rooms = roomRepository.findAll();  // すべてのルームを取得し、パスワードをチェック
+
+        // ルームを一つずつ確認し、ハッシュ化パスワードと平文パスワードを照合
+        for (RoomEntity room : rooms) {
+            if (bCryptPasswordEncoder.matches(password, room.getPassword())) {
+                return room;  // パスワードが一致した場合、そのルームを返す
+            }
+        }
+
+        // 一致するルームが見つからなかった場合
+        return null;
+    }
+
 }
