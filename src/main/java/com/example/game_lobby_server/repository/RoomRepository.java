@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<RoomEntity, Integer> {
     Optional<RoomEntity> findByPassword(String password);
+
+    boolean existsByName(String name);
 }

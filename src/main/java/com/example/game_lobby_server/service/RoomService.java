@@ -1,6 +1,7 @@
  package com.example.game_lobby_server.service;
 
 import com.example.game_lobby_server.entity.RoomEntity;
+import com.example.game_lobby_server.exception.RoomCreationException;
 import com.example.game_lobby_server.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +29,10 @@ public class RoomService {
      * @return プレーンな4桁のパスワード（ユーザーに通知用）
      */
     public String createRoom(String roomName) {
+        if (existsByName(roomName)) {
+            throw new RoomCreationException("同じ名前のルームが既に存在します: " + roomName);
+        }
+
         // 4桁の数字パスワードを生成
         String plainPassword = generateRandom4Digit();
 
@@ -37,15 +42,15 @@ public class RoomService {
         // RoomEntityを作成
         RoomEntity roomEntity = new RoomEntity();
         roomEntity.setName(roomName);
-        roomEntity.setPassword(hashedPassword); // ハッシュ化したパスワードをセット
+        roomEntity.setPassword(hashedPassword);
         roomEntity.setCreatedAt(LocalDateTime.now());
 
         // DBに保存
         roomRepository.save(roomEntity);
 
-        // プレーンなパスワードを返却（ユーザーに通知するため）
-        return plainPassword;
+        return plainPassword;  // 通知用のパスワードを返却
     }
+
 
     /**
      * 4桁の数字パスワードを生成するヘルパーメソッド
@@ -72,6 +77,16 @@ public class RoomService {
     public RoomEntity getRoomById(int roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new NoSuchElementException("指定したルームが見つかりません。ID=" + roomId));
+    }
+
+    /**
+     * 同名のルームが存在するかチェック
+     */
+    public boolean existsByName(String roomName) {
+        // findByName を使うため、リポジトリにメソッドを追加してもOK
+        // ここでは例として getAllRooms() して名前を手動で探すやり方でもよい
+        return roomRepository.findAll().stream()
+                .anyMatch(r -> r.getName().equals(roomName));
     }
 
     /**
