@@ -1,5 +1,6 @@
 package com.example.game_lobby_server.support;
 
+import com.example.game_lobby_server.service.JwtSecretKeyService;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,16 +10,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public static final String SECRET = "group_c";
+    private final JwtSecretKeyService jwtSecretKeyService;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager, JwtSecretKeyService jwtSecretKeyService) {
         super(authenticationManager);
+        this.jwtSecretKeyService = jwtSecretKeyService;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        // AuthorizationヘッダのBearer Prefixである場合
+
         UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -42,9 +44,11 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (token != null) {
-            // parse the token.
+            // JwtSecretKeyService を使用してシークレットキーを取得
+            String secret = jwtSecretKeyService.getSecretKey();
+
             String user = Jwts.parser()
-                    .setSigningKey(SECRET.getBytes())
+                    .setSigningKey(secret.getBytes())
                     .parseClaimsJws(token.replace("Bearer ", ""))
                     .getBody()
                     .getSubject();
@@ -56,5 +60,4 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         }
         return null;
     }
-
 }

@@ -1,6 +1,7 @@
 package com.example.game_lobby_server.support;
 
 import com.example.game_lobby_server.controller.UserForm;
+import com.example.game_lobby_server.service.JwtSecretKeyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,30 +16,32 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtSecretKeyService jwtSecretKeyService;
 
-    public static final String SECRET = "groupcjyouhoujikkenntestatodekesimasugosugosugosugogosugoitesttesttesttestetetetetetetete";//テスト
-    private AuthenticationManager authenticationManager;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    // コンストラクタにJwtSecretKeyServiceを追加
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager,
+                                   BCryptPasswordEncoder bCryptPasswordEncoder,
+                                   JwtSecretKeyService jwtSecretKeyService) {
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtSecretKeyService = jwtSecretKeyService;
 
         // ログイン用のpathを変更する
         setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
-
     }
 
     // 認証の処理
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest req,
-                                                HttpServletResponse res)  {
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
         try {
             // requestパラメータからユーザ情報を読み取る
             UserForm userForm = new ObjectMapper().readValue(req.getInputStream(), UserForm.class);
@@ -54,7 +57,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
-
     // 認証に成功した場合の処理
     @Override
     protected void successfulAuthentication(HttpServletRequest req,
@@ -62,15 +64,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
+        // JwtSecretKeyServiceから秘密鍵を取得
+        String secretKey = jwtSecretKeyService.getSecretKey();
+
         String token = Jwts.builder()
-                .setSubject(((User)auth.getPrincipal()).getUsername()) // usernameだけを設定する
-                .setExpiration(new Date(System.currentTimeMillis() + 28_800_000)) //8時間
-                .signWith(SignatureAlgorithm.HS512, SECRET.getBytes())
+                .setHeaderParam("typ", "JWT") // "typ": "JWT" を追加
+                .setSubject(((User) auth.getPrincipal()).getUsername()) // usernameだけを設定する
+                .setExpiration(new Date(System.currentTimeMillis() + 28_800_000)) // 8時間
+                .signWith(SignatureAlgorithm.HS512, secretKey.getBytes())
                 .compact();
-        res.addHeader("Authorization", "Bearer " + token);
 
-        // ここでレスポンスを組み立てると個別のパラメータを返せるがFilterの責務の範囲内で実施しなければならない
-        // auth.getPrincipal()で取得できるUserDetailsは自分で作ったEntityクラスにもできるのでカスタム属性は追加可能
+        // JSONレスポンスを作成
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        res.getWriter().write("{\"token\": \"" + token + "\"}");
     }
-
 }

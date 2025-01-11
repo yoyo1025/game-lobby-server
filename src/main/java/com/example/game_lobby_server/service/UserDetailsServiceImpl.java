@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        // 本来ならここでDBなどからユーザを検索することになるが
+
         //貰った名前からユーザーを割り出し、DBに格納されているパスワードを復号して、入力されたパスワードと比較する
         UserEntity userEntity = userEntityRepository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + username));

@@ -41,11 +41,4 @@ public class LobbyController {
         return ResponseEntity.ok(responseDto);
     }
 
-
-    //テスト
-    @GetMapping("/home")
-    public String home() {
-        return "Welcome to the home page!";
-    }
-
 }

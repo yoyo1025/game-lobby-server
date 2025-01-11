@@ -21,6 +21,8 @@ public class SecurityConfig {
     }
 
 
+
+
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         // UserDetailsService と BCryptPasswordEncoder を設定
         auth.userDetailsService(userDetailsService)
