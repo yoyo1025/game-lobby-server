@@ -21,7 +21,7 @@ public class WebSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRFを無効化
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/signup").permitAll() // /signupは誰でもアクセス可能
+                        .requestMatchers("/signup", "/make-room").permitAll() // /signupは誰でもアクセス可能
                         .anyRequest().authenticated()          // その他のリクエストは認証が必要
                 );
 
