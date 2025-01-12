@@ -1,10 +1,8 @@
 package com.example.game_lobby_server.controller;
 
-import com.example.game_lobby_server.dto.ResponseDto;
-import com.example.game_lobby_server.dto.RoomCreateRequestDto;
-import com.example.game_lobby_server.dto.RoomJoinRequestDto;
-import com.example.game_lobby_server.dto.RoomResponseDto;
+import com.example.game_lobby_server.dto.*;
 import com.example.game_lobby_server.entity.RoomEntity;
+import com.example.game_lobby_server.service.BattleRecordService;
 import com.example.game_lobby_server.service.RoomService;
 import com.example.game_lobby_server.service.SignUpService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,9 @@ public class LobbyController {
     public LobbyController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
-
+  
+    @Autowired
+    private BattleRecordService battleRecordService;
 
     @PostMapping(value = "/signup")
     public ResponseEntity<ResponseDto> signup(@RequestBody UserForm user) {
@@ -150,5 +150,12 @@ public class LobbyController {
 
     public static void removeUser(String sessionId) {
         connectedUsers.remove(sessionId);
+    }
+
+    @GetMapping("/battlerecord/{id}")
+    public ResponseEntity<BattleStatsDto> getBattleStats(@PathVariable int id) {
+        BattleStatsDto responseDto  = battleRecordService.getUserBattleStats(id);
+
+        return ResponseEntity.ok(responseDto);
     }
 }
