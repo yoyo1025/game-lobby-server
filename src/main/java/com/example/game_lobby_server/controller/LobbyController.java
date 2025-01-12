@@ -9,10 +9,14 @@ import com.example.game_lobby_server.service.RoomService;
 import com.example.game_lobby_server.service.SignUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 
 @RestController
 public class LobbyController {
@@ -25,6 +29,8 @@ public class LobbyController {
 
     @Autowired
     private RoomService roomService;
+  
+    private AuthenticationManager authenticationManager;
 
 
     @PostMapping(value = "/signup")
@@ -42,6 +48,7 @@ public class LobbyController {
         // レスポンスDTOを返す
         return ResponseEntity.ok(responseDto);
     }
+
 
     /**
      * 新規ルーム作成用のエンドポイント
