@@ -62,6 +62,26 @@ public class LobbyController {
         ResponseDto responseDto = new ResponseDto(createdPassword, "success");
         return ResponseEntity.ok(responseDto);
     }
+    /**
+     * ルーム参加用エンドポイント
+     * JSON で { "password": "1234" } を受け取り
+     * パスワードが一致するルームがあれば参加成功
+     */
+    @PostMapping("/room-join")
+    public ResponseEntity<ResponseDto> joinRoom(@RequestBody RoomJoinRequestDto requestDto) {
+        String password = requestDto.getPassword();
+
+        RoomEntity joinedRoom = roomService.joinRoom(password);
+        if (joinedRoom != null) {
+            // 参加成功時、roomIdを付与して返却
+            return ResponseEntity.ok(new ResponseDto("ルーム参加に成功しました", "success", joinedRoom.getId()));
+        } else {
+            // 参加失敗時
+            return ResponseEntity.status(400).body(
+                    new ResponseDto("ルーム参加に失敗しました。パスワードが違います。", "error", null)
+            );
+        }
+    }
 
     /**
      * 全てのルーム情報を取得
@@ -94,25 +114,4 @@ public class LobbyController {
         );
         return ResponseEntity.ok(responseDto);
     }
-    /**
-     * ルーム参加用エンドポイント
-     * JSON で { "password": "1234" } を受け取り
-     * パスワードが一致するルームがあれば参加成功
-     */
-    @PostMapping("/room-join")
-    public ResponseEntity<ResponseDto> joinRoom(@RequestBody RoomJoinRequestDto requestDto) {
-        String password = requestDto.getPassword();
-
-        RoomEntity joinedRoom = roomService.joinRoom(password);
-        if (joinedRoom != null) {
-            // 参加成功
-            return ResponseEntity.ok(new ResponseDto("ルーム参加に成功しました", "success"));
-        } else {
-            // 参加失敗
-            return ResponseEntity.status(400).body(
-                    new ResponseDto("ルーム参加に失敗しました。パスワードが違います。", "error")
-            );
-        }
-    }
-
 }
