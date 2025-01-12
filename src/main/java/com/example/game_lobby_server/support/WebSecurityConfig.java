@@ -46,7 +46,7 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRFを無効化
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 最新の CORS 設定
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/signup", "/login", "/make-room", "/rooms", "/rooms/**", "/room-join").permitAll() // signupとloginは誰でもアクセス可能
+                        .requestMatchers("/signup", "/login", "/make-room", "/rooms", "/rooms/**", "/room-join", "/lobby-websocket/**").permitAll() // signupとloginは誰でもアクセス可能
                         .anyRequest().authenticated() // その他のリクエストは認証が必要
                 )
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, bCryptPasswordEncoder,jwtSecretKeyService)) // AuthenticationManager を渡す
