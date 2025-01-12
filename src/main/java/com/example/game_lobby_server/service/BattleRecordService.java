@@ -31,7 +31,9 @@ public class BattleRecordService {
 
         // 総試合数、勝利回数、鬼での勝利回数を計算
         int totalMatches = records.size();
-        int totalWins = (int) records.stream().filter(BattleRecord::isWin).count();
+        int totalWins = (int) records.stream()
+                .filter(record -> record.isWin() && "村人".equals(record.getRole()) && record.getRanking() == 1)
+                .count();
         int demonWins = (int) records.stream()
                 .filter(record -> record.isWin() && "鬼".equals(record.getRole()))
                 .count();
