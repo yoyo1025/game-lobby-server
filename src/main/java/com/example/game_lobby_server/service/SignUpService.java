@@ -1,11 +1,9 @@
 package com.example.game_lobby_server.service;
 
-import com.example.game_lobby_server.entity.UserEntity;
+import com.example.game_lobby_server.entity.User;
 import com.example.game_lobby_server.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,7 +29,7 @@ public class SignUpService {
 
         // DBに登録する処理
         // 作成日とIDは勝手に挿入される
-        UserEntity userEntity = new UserEntity();
+        User userEntity = new User();
         userEntity.setName(userName);
         userEntity.setPassword(encryptedPassword);
 
