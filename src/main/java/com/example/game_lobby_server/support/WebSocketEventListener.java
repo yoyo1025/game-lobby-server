@@ -4,6 +4,7 @@ import com.example.game_lobby_server.controller.LobbyController;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -22,9 +23,13 @@ public class WebSocketEventListener {
         // 接続時のイベント
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        String userId = headerAccessor.getFirstNativeHeader("userId");
+        // ChannelInterceptor で保存した userId, userName を取り出す
+        String userId = (String) headerAccessor.getSessionAttributes().get("userId");
+        String userName = (String) headerAccessor.getSessionAttributes().get("userName");
         String roomId = headerAccessor.getFirstNativeHeader("roomId");
-        System.out.println("roomId: " + roomId);
+        System.out.println("WebSocket Connect: sessionId=" + sessionId
+                + ", userId=" + userId + ", userName=" + userName
+                + ", roomId=" + roomId);
 
         // 上限チェック
         boolean addedUser = LobbyController.addUser(sessionId, userId);

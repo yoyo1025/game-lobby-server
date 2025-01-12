@@ -1,6 +1,7 @@
 package com.example.game_lobby_server.support;
 
 import com.example.game_lobby_server.controller.UserForm;
+import com.example.game_lobby_server.entity.JWTUserDetails;
 import com.example.game_lobby_server.service.JwtSecretKeyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -56,25 +56,32 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new RuntimeException(e);
         }
     }
-
-    // 認証に成功した場合の処理
     @Override
     protected void successfulAuthentication(HttpServletRequest req,
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
-        // JwtSecretKeyServiceから秘密鍵を取得
         String secretKey = jwtSecretKeyService.getSecretKey();
 
+        // customUserDetails を取り出す
+        JWTUserDetails jwtUserDetails = (JWTUserDetails) auth.getPrincipal();
+        Integer userId = jwtUserDetails.getUserId();
+        String userName = jwtUserDetails.getUsername();
+
+        System.out.println("JWT userId: " + userId);
+        System.out.println("JWT userName: " + userName);
+
         String token = Jwts.builder()
-                .setHeaderParam("typ", "JWT") // "typ": "JWT" を追加
-                .setSubject(((User) auth.getPrincipal()).getUsername()) // usernameだけを設定する
-                .setExpiration(new Date(System.currentTimeMillis() + 28_800_000)) // 8時間
+                .setHeaderParam("typ", "JWT")
+                .setSubject(userName)  // subject に userName を入れる例
+                .setExpiration(new Date(System.currentTimeMillis() + 28_800_000))
+                // カスタムクレームとして userId, userName を付与
+                .claim("userId", userId)
+                .claim("userName", userName)
                 .signWith(SignatureAlgorithm.HS512, secretKey.getBytes())
                 .compact();
 
-        // JSONレスポンスを作成
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.getWriter().write("{\"token\": \"" + token + "\"}");

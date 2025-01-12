@@ -1,6 +1,8 @@
 package com.example.game_lobby_server.service;
 
+import com.example.game_lobby_server.entity.JWTUserDetails;
 import com.example.game_lobby_server.entity.UserEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.game_lobby_server.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 
 
 @Service
@@ -21,17 +24,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-
-        //貰った名前からユーザーを割り出し、DBに格納されているパスワードを復号して、入力されたパスワードと比較する
         UserEntity userEntity = userEntityRepository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + username));
 
-
-
-        return User.withUsername(username)
-                .password(userEntity.getPassword())
-                .authorities("ROLE_USER") // ユーザの権限
-                .build();
+        // ここでカスタムUserDetailsを作る
+        return new JWTUserDetails(
+                userEntity.getId(),          // userId
+                userEntity.getName(),        // userName (username)
+                userEntity.getPassword(),    // password (暗号化済み)
+                List.of(new SimpleGrantedAuthority("ROLE_USER")) // 権限
+        );
     }
+
 
 }

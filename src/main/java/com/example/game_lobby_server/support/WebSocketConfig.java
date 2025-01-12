@@ -1,6 +1,8 @@
 package com.example.game_lobby_server.support;
 
+import com.example.game_lobby_server.service.JwtSecretKeyService;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -9,6 +11,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final JwtSecretKeyService jwtSecretKeyService;
+
+    public WebSocketConfig(JwtSecretKeyService jwtSecretKeyService) {
+        this.jwtSecretKeyService = jwtSecretKeyService;
+    }
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // クライアントへの送り口の設定
@@ -24,5 +32,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/lobby-websocket")
                 .setAllowedOriginPatterns("http://localhost:3000")
                 .withSockJS();
+    }
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new JwtChannelInterceptor(jwtSecretKeyService));
     }
 }
