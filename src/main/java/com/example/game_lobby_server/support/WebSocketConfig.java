@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // クライアントが最初にWebSocketを繋ぐ際の繋ぎ口
         registry.addEndpoint("/lobby-websocket")
-                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOriginPatterns("http://localhost:3000")
                 .withSockJS();
     }
 }

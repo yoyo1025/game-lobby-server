@@ -23,6 +23,8 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         String userId = headerAccessor.getFirstNativeHeader("userId");
+        String roomId = headerAccessor.getFirstNativeHeader("roomId");
+        System.out.println("roomId: " + roomId);
 
         // 上限チェック
         boolean addedUser = LobbyController.addUser(sessionId, userId);
@@ -36,6 +38,7 @@ public class WebSocketEventListener {
         System.out.println("sessionId: " + sessionId + ", userId: " + userId);
         LobbyController.addUser(sessionId, userId);
         System.out.println("現在のプレイヤー数: " + LobbyController.connectedUsers.size());
+        messagingTemplate.convertAndSend("/topic/room/" + roomId, sessionId + " has connected.");
     }
 
     // ブラウザを閉じたりリロードしたり、もしくは通信が途切れたりしたことでWebSocket接続が切断された時に発火するイベント
