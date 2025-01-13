@@ -3,8 +3,6 @@ package com.example.game_lobby_server.service;
 import com.example.game_lobby_server.entity.JWTUserDetails;
 import com.example.game_lobby_server.entity.UserEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import com.example.game_lobby_server.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
