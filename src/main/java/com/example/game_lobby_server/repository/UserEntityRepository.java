@@ -1,5 +1,6 @@
 package com.example.game_lobby_server.repository;
 
+import com.example.game_lobby_server.entity.User;
 import com.example.game_lobby_server.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,22 +1,31 @@
 package com.example.game_lobby_server.controller;
 
-import com.example.game_lobby_server.dto.ResponseDto;
-import com.example.game_lobby_server.dto.RoomCreateRequestDto;
-import com.example.game_lobby_server.dto.RoomJoinRequestDto;
-import com.example.game_lobby_server.dto.RoomResponseDto;
+import com.example.game_lobby_server.dto.*;
 import com.example.game_lobby_server.entity.RoomEntity;
+import com.example.game_lobby_server.service.BattleRecordService;
 import com.example.game_lobby_server.service.RoomService;
 import com.example.game_lobby_server.service.SignUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class LobbyController {
+
+    public final SimpMessagingTemplate messagingTemplate;
+
+    // 接続中のuserIdを保存(sessionId -> userId)
+    public static final ConcurrentHashMap<String, String> connectedUsers = new ConcurrentHashMap<>();
+
+    // 接続上限を定義
+    public static final int MAX_CONNECTIONS = 4;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -29,6 +38,12 @@ public class LobbyController {
   
     private AuthenticationManager authenticationManager;
 
+    public LobbyController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+  
+    @Autowired
+    private BattleRecordService battleRecordService;
 
     @PostMapping(value = "/signup")
     public ResponseEntity<ResponseDto> signup(@RequestBody UserForm user) {
@@ -116,6 +131,31 @@ public class LobbyController {
                 room.getName(),
                 room.getCreatedAt()
         );
+        return ResponseEntity.ok(responseDto);
+    }
+
+    // 接続中かチェック
+    public static boolean checkDuplicatedUser(String userId) {
+        return connectedUsers.containsValue(userId);
+    }
+
+    // ユーザーを追加する際に、上限に達していたら false を返す
+    public static boolean addUser(String sessionId, String userId) {
+        if (connectedUsers.size() >= MAX_CONNECTIONS) {
+            return false;
+        }
+        connectedUsers.put(sessionId, userId);
+        return true;
+    }
+
+    public static void removeUser(String sessionId) {
+        connectedUsers.remove(sessionId);
+    }
+
+    @GetMapping("/battlerecord/{id}")
+    public ResponseEntity<BattleStatsDto> getBattleStats(@PathVariable int id) {
+        BattleStatsDto responseDto  = battleRecordService.getUserBattleStats(id);
+
         return ResponseEntity.ok(responseDto);
     }
 }
