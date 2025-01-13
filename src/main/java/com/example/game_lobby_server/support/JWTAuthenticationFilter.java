@@ -84,6 +84,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        res.getWriter().write("{\"token\": \"" + token + "\"}");
+        res.getWriter().write("{\"token\": \"" + token + "\", \"userId\": " + userId + "}");
     }
 }
