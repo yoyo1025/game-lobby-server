@@ -113,40 +113,6 @@ public class WebSocketEventListener {
         }).start();
     }
 
-//    private void sendPlayerInfoToExternalApi(int roomId) {
-//        Set<Player> players = roomPlayerManager.getPlayers(roomId);
-//        if (players.size() < 4) {
-//            // 10秒の間に誰か抜けた場合など
-//            System.out.println("Room " + roomId + " no longer has 4 players, abort sending.");
-//            return;
-//        }
-//
-//        // [1] isDemonフラグを誰か1人だけ true にする (例: 乱数で決定)
-//        // [2] JSON のリストを作る
-//        // [3] RestTemplate や WebClient で POST する
-//
-//        // 例: isDemon をランダムに1名だけ true にする
-//        List<PlayerInfo> infoList = new ArrayList<>();
-//        int demonIndex = new Random().nextInt(players.size());
-//        int idx = 0;
-//        for (Player p : players) {
-//            boolean isDemon = (idx == demonIndex);
-//            infoList.add(new PlayerInfo(p.getUserId(), p.getUserName(), isDemon));
-//            idx++;
-//        }
-//
-//        // POST 用に JSON へシリアライズ
-//        // Spring なら RestTemplate でも WebClient でも可
-//        try {
-//            RestTemplate restTemplate = new RestTemplate();
-//            String url = "http://localhost:8000/api/init-player-info";
-//            ResponseEntity<String> response = restTemplate.postForEntity(url, infoList, String.class);
-//            System.out.println("Sent player info, response: " + response.getBody());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     private void sendPlayerInfoToExternalApi(int roomId) {
         Set<Player> players = roomPlayerManager.getPlayers(roomId);
         if (players.size() < 4) {
