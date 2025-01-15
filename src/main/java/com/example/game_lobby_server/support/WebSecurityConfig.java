@@ -70,7 +70,14 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 許可するURL
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://172.31.120.116:3000",
+                "http://172.31.125.54:3000",
+                "http://172.30.161.76:3000",
+                "http://172.31.94.191:3000"
+        )); // 許可するURL
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 許可するHTTPメソッド
         configuration.setAllowedHeaders(List.of("Content-Type", "Authorization")); // 許可するヘッダー
         configuration.setAllowCredentials(true); // クッキーを許可

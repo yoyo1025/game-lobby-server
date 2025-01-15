@@ -30,8 +30,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // クライアントが最初にWebSocketを繋ぐ際の繋ぎ口
         registry.addEndpoint("/lobby-websocket")
-                .setAllowedOriginPatterns("http://localhost:3000")
-                .withSockJS();
+                .setAllowedOriginPatterns(
+                        "http://172.31.120.116:3000",
+                        "http://172.31.125.54:3000",
+                        "http://172.30.161.76:3000",
+                        "http://172.31.94.191:3000"
+                ).withSockJS();
     }
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {

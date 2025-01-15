@@ -16,7 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://172.31.120.116:3000",
+        "http://172.31.125.54:3000",
+        "http://172.30.161.76:3000",
+        "http://172.31.94.191:3000"
+})
 public class LobbyController {
 
     public final SimpMessagingTemplate messagingTemplate;
